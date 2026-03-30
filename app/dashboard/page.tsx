@@ -66,12 +66,12 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold text-slate-900">Panel</h1>
           <p className="text-sm text-slate-500">Hoş geldin {fullName || user?.email?.split('@')[0] || ''}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Link href="/dashboard/new-listing">
-            <Button><Plus className="mr-2 h-4 w-4" />Yeni İlan</Button>
+            <Button className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" />Yeni İlan</Button>
           </Link>
           <Link href="/dashboard/customers">
-            <Button variant="outline"><Users className="mr-2 h-4 w-4" />Müşteriler</Button>
+            <Button variant="outline" className="w-full sm:w-auto"><Users className="mr-2 h-4 w-4" />Müşteriler</Button>
           </Link>
         </div>
       </div>
@@ -190,12 +190,12 @@ export default function DashboardPage() {
                   href={`/dashboard/listings/${listing.id}`}
                   className="block p-4 border rounded-lg hover:bg-slate-50 transition-colors"
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-slate-900">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-slate-900 line-clamp-1">
                         {listing.title || 'Başlıksız İlan'}
                       </h3>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-600 mt-1 line-clamp-1 break-words">
                         {(listing.property_features?.listing_type === 'rent' ? 'Kiralık' : 'Satılık')} • {listing.property_features?.room_layout || '-'} • {listing.property_features?.gross_m2 || '-'} m²
                       </p>
                     </div>

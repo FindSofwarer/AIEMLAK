@@ -201,14 +201,14 @@ export default function AppointmentsPage() {
 
                 return (
                   <div key={a.id} className="p-4 border rounded-lg bg-white">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{a.title}</h3>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-slate-900 break-words">{a.title}</h3>
                         <p className="text-sm text-slate-600">
                           {new Date(a.starts_at).toLocaleString('tr-TR')}
                           {a.ends_at ? ` - ${new Date(a.ends_at).toLocaleString('tr-TR')}` : ''}
                         </p>
-                        <p className="text-sm text-slate-600 mt-1">
+                        <p className="text-sm text-slate-600 mt-1 break-words">
                           Müşteri: {customer?.full_name || '-'} • Portföy: {listing?.title || 'Seçilmedi'}
                         </p>
                         {a.notes && <p className="text-sm text-slate-500 mt-1">{a.notes}</p>}

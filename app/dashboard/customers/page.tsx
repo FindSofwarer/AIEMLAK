@@ -176,13 +176,13 @@ export default function CustomersPage() {
               {customers.map((c) => (
                 <div key={c.id} className="p-4 border rounded-lg bg-white">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <h3 className="font-semibold text-slate-900">{c.full_name}</h3>
-                      <p className="text-sm text-slate-600">{c.phone || '-'} • {c.email || '-'}</p>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-slate-900 break-words">{c.full_name}</h3>
+                      <p className="text-sm text-slate-600 break-all">{c.phone || '-'} • {c.email || '-'}</p>
                     </div>
                     <div className="flex gap-2">
                       {c.budget_min || c.budget_max ? (
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="whitespace-normal text-center">
                           {c.budget_min ? `${c.budget_min.toLocaleString('tr-TR')}₺` : '...'} - {c.budget_max ? `${c.budget_max.toLocaleString('tr-TR')}₺` : '...'}
                         </Badge>
                       ) : null}
