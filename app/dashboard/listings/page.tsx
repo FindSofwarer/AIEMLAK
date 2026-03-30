@@ -63,7 +63,7 @@ export default function ListingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">İlanlarım</h1>
           <p className="mt-2 text-slate-600">
@@ -71,7 +71,7 @@ export default function ListingsPage() {
           </p>
         </div>
         <Link href="/dashboard/new-listing">
-          <Button>
+          <Button className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Yeni İlan
           </Button>

@@ -157,8 +157,8 @@ export default function ListingDetailPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start sm:items-center space-x-4">
           <Link href="/dashboard/listings">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
@@ -171,7 +171,7 @@ export default function ListingDetailPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Badge
             variant={listing.status === 'published' ? 'default' : 'secondary'}
             className={

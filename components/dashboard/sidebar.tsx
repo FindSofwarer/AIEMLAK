@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Chrome as Home, Plus, FolderOpen, User, LogOut, Users, CalendarClock } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 
-const navigation = [
+export const navigation = [
   { name: 'Ana Sayfa', href: '/dashboard', icon: Home },
   { name: 'Yeni İlan', href: '/dashboard/new-listing', icon: Plus },
   { name: 'İlanlarım', href: '/dashboard/listings', icon: FolderOpen },
@@ -16,12 +16,17 @@ const navigation = [
   { name: 'Profil', href: '/dashboard/profile', icon: User },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  className?: string;
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ className, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const { signOut } = useAuth();
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 text-white">
+    <div className={cn('flex flex-col h-full bg-slate-900 text-white', className)}>
       <div className="flex items-center space-x-3 p-6 border-b border-slate-800">
         <div className="bg-white p-2 rounded-lg">
           <Home className="h-6 w-6 text-slate-900" />
@@ -39,6 +44,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 'flex items-center space-x-3 px-3 py-3 rounded-lg transition-all',
                 isActive
@@ -57,7 +63,10 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start text-slate-300 hover:text-white hover:bg-slate-800"
-          onClick={signOut}
+          onClick={async () => {
+            onNavigate?.();
+            await signOut();
+          }}
         >
           <LogOut className="mr-3 h-5 w-5" />
           Çıkış Yap

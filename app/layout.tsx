@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import type { Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/lib/contexts/auth-context';
 import { Toaster } from 'sonner';
@@ -26,6 +27,13 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#0f172a',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -36,7 +44,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           {children}
-          <Toaster position="top-right" />
+          <Toaster position="top-center" richColors />
         </AuthProvider>
       </body>
     </html>
