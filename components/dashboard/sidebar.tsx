@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Chrome as Home, Plus, FolderOpen, User, LogOut } from 'lucide-react';
+import { Chrome as Home, Plus, FolderOpen, User, LogOut, Users, CalendarClock } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 const navigation = [
   { name: 'Ana Sayfa', href: '/dashboard', icon: Home },
   { name: 'Yeni İlan', href: '/dashboard/new-listing', icon: Plus },
   { name: 'İlanlarım', href: '/dashboard/listings', icon: FolderOpen },
+  { name: 'Müşteriler', href: '/dashboard/customers', icon: Users },
+  { name: 'Randevular', href: '/dashboard/appointments', icon: CalendarClock },
   { name: 'Profil', href: '/dashboard/profile', icon: User },
 ];
 

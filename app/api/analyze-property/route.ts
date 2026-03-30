@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { imageUrls } = await request.json();
+    const { imageUrls, propertyDetails } = await request.json();
 
     if (!imageUrls || imageUrls.length === 0) {
       return NextResponse.json(
@@ -153,6 +153,10 @@ export async function POST(request: NextRequest) {
       })
     );
 
+    const propertyDetailsContext = propertyDetails
+      ? `\n\nKULLANICININ GİRDİĞİ PORTFÖY KEYPOINT BİLGİLERİ:\n${JSON.stringify(propertyDetails, null, 2)}\nBu bilgiler görsellerle çelişmiyorsa öncelikli kabul edilsin.`
+      : '';
+
     const prompt = `Bu fotoğraflardaki evi profesyonel bir emlakçı ve iç mimar perspektifinden analiz et.
 
 GÖREV 1: Teknik Analiz
@@ -187,7 +191,7 @@ Türkiye emlak sektörüne uygun, ikna edici ve profesyonel bir ilan metni yaz:
   }
 }
 
-Lütfen sadece JSON yanıtı ver, başka açıklama ekleme.`;
+Lütfen sadece JSON yanıtı ver, başka açıklama ekleme.${propertyDetailsContext}`;
 
     const availableModels = await getAvailableGeminiModels(process.env.GEMINI_API_KEY || '');
     const preferredModels = [

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Copy, Share2, Loader as Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Copy, Share2, Loader as Loader2, Sparkles, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import { Listing } from '@/lib/types/database';
 import { toast } from 'sonner';
@@ -26,6 +26,37 @@ export default function ListingDetailPage() {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  const buildMarketplaceTemplate = (platform: 'sahibinden' | 'emlakjet') => {
+    const f = listing?.property_features || {};
+
+    const lines = [
+      `Platform: ${platform}`,
+      `Başlık: ${title || '-'}`,
+      `Açıklama: ${description || '-'}`,
+      `İlan Tipi: ${f.listing_type || '-'}`,
+      `Gayrimenkul Tipi: ${f.property_type || '-'}`,
+      `Oda Düzeni: ${f.room_layout || f.rooms || '-'}`,
+      `Brüt m²: ${f.gross_m2 || '-'}`,
+      `Net m²: ${f.net_m2 || '-'}`,
+      `Bina Yaşı: ${f.building_age || '-'}`,
+      `Bulunduğu Kat: ${f.floor_no || '-'}`,
+      `Toplam Kat: ${f.total_floors || '-'}`,
+      `Isıtma: ${f.heating_type || '-'}`,
+      `Banyo Sayısı: ${f.bathrooms_count || f.bathrooms || '-'}`,
+      `Balkon Sayısı: ${f.balcony_count || '-'}`,
+      `Eşyalı: ${typeof f.furnished === 'boolean' ? (f.furnished ? 'Evet' : 'Hayır') : '-'}`,
+      `Kullanım Durumu: ${f.usage_status || '-'}`,
+      `Aidat (₺): ${f.dues_try || '-'}`,
+      `Tapu Durumu: ${f.deed_status || '-'}`,
+      `Konum Notu: ${f.location_note || '-'}`,
+      `Çevre/Yakınlık: ${f.proximity_note || '-'}`,
+      `Ek Özellikler: ${Array.isArray(f.amenities) ? f.amenities.join(', ') : '-'}`,
+      `Fotoğraflar: ${(listing?.image_urls || []).join(', ') || '-'}`,
+    ];
+
+    return lines.join('\n');
+  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -275,6 +306,61 @@ export default function ListingDetailPage() {
             <Copy className="mr-2 h-4 w-4" />
             Sosyal Medya Metnini Kopyala
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-slate-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5" />
+            Pazar Yeri Form Çıktısı
+          </CardTitle>
+          <CardDescription>
+            Sahibinden / Emlakjet formlarına yapıştırmak için tek tuş çıktı
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Sahibinden Çıktısı</Label>
+            <Textarea
+              value={buildMarketplaceTemplate('sahibinden')}
+              readOnly
+              rows={12}
+              className="resize-none font-mono text-xs"
+            />
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                navigator.clipboard.writeText(buildMarketplaceTemplate('sahibinden'));
+                toast.success('Sahibinden form çıktısı kopyalandı');
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Sahibinden Çıktısını Kopyala
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Emlakjet Çıktısı</Label>
+            <Textarea
+              value={buildMarketplaceTemplate('emlakjet')}
+              readOnly
+              rows={12}
+              className="resize-none font-mono text-xs"
+            />
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                navigator.clipboard.writeText(buildMarketplaceTemplate('emlakjet'));
+                toast.success('Emlakjet form çıktısı kopyalandı');
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Emlakjet Çıktısını Kopyala
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

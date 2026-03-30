@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, FolderOpen, Sparkles } from 'lucide-react';
+import { Plus, FolderOpen, Sparkles, Users, CalendarClock } from 'lucide-react';
 import Link from 'next/link';
 import { Listing } from '@/lib/types/database';
 
@@ -41,7 +41,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
         <Card className="border-slate-200 hover:shadow-lg transition-shadow">
           <CardHeader>
             <div className="flex items-center space-x-3">
@@ -102,6 +102,50 @@ export default function DashboardPage() {
             <p className="text-sm text-slate-600">
               Fotoğraflarınız yapay zeka tarafından analiz edilerek profesyonel ilan metinleri oluşturulur.
             </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200 hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <div className="bg-slate-900 p-3 rounded-lg">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <CardTitle>Müşteriler</CardTitle>
+                <CardDescription>Lead ve rehber yönetimi</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/customers">
+              <Button variant="outline" className="w-full">
+                <Users className="mr-2 h-4 w-4" />
+                Müşteri Rehberi
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200 hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <div className="bg-slate-900 p-3 rounded-lg">
+                <CalendarClock className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <CardTitle>Randevular</CardTitle>
+                <CardDescription>Gezdirme planını oluştur</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/appointments">
+              <Button variant="outline" className="w-full">
+                <CalendarClock className="mr-2 h-4 w-4" />
+                Takvime Git
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Upload, Loader as Loader2, Sparkles, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { ListingKeypoints } from '@/lib/types/database';
 
 export default function NewListingPage() {
   const { user } = useAuth();
@@ -24,6 +25,25 @@ export default function NewListingPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [features, setFeatures] = useState<any>({});
+  const [keypoints, setKeypoints] = useState<ListingKeypoints>({
+    listing_type: 'sale',
+    property_type: '',
+    gross_m2: null,
+    net_m2: null,
+    room_layout: '',
+    building_age: null,
+    floor_no: null,
+    total_floors: null,
+    heating_type: '',
+    bathrooms_count: null,
+    balcony_count: null,
+    furnished: null,
+    usage_status: '',
+    dues_try: null,
+    deed_status: '',
+    location_note: '',
+    proximity_note: '',
+  });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -86,7 +106,7 @@ export default function NewListingPage() {
       const response = await fetch('/api/analyze-property', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrls }),
+        body: JSON.stringify({ imageUrls, propertyDetails: keypoints }),
       });
 
       if (!response.ok) throw new Error('AI analizi başarısız oldu');
@@ -103,7 +123,10 @@ export default function NewListingPage() {
         title: aiTitle,
         description: aiDescription,
         image_urls: imageUrls,
-        property_features: aiFeatures,
+        property_features: {
+          ...keypoints,
+          ...aiFeatures,
+        },
         status: 'draft',
       });
 
@@ -211,6 +234,133 @@ export default function NewListingPage() {
               )}
             </Button>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-slate-200">
+        <CardHeader>
+          <CardTitle>Portföy Keypoint Bilgileri</CardTitle>
+          <CardDescription>
+            Sahibinden / Emlakjet filtrelerine uygun temel alanları girin. AI metni buna göre güçlendirilir.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label>İlan Tipi</Label>
+            <Input
+              placeholder="sale / rent"
+              value={keypoints.listing_type || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, listing_type: e.target.value as 'sale' | 'rent' }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Gayrimenkul Tipi</Label>
+            <Input
+              placeholder="Daire, Villa..."
+              value={keypoints.property_type || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, property_type: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Oda Düzeni</Label>
+            <Input
+              placeholder="3+1"
+              value={keypoints.room_layout || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, room_layout: e.target.value }))}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Brüt m²</Label>
+            <Input
+              type="number"
+              value={keypoints.gross_m2 ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, gross_m2: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Net m²</Label>
+            <Input
+              type="number"
+              value={keypoints.net_m2 ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, net_m2: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Bina Yaşı</Label>
+            <Input
+              type="number"
+              value={keypoints.building_age ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, building_age: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Bulunduğu Kat</Label>
+            <Input
+              type="number"
+              value={keypoints.floor_no ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, floor_no: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Toplam Kat</Label>
+            <Input
+              type="number"
+              value={keypoints.total_floors ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, total_floors: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Isıtma</Label>
+            <Input
+              placeholder="Kombi, Merkezi..."
+              value={keypoints.heating_type || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, heating_type: e.target.value }))}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Banyo Sayısı</Label>
+            <Input
+              type="number"
+              value={keypoints.bathrooms_count ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, bathrooms_count: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Balkon Sayısı</Label>
+            <Input
+              type="number"
+              value={keypoints.balcony_count ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, balcony_count: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Aidat (₺)</Label>
+            <Input
+              type="number"
+              value={keypoints.dues_try ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, dues_try: e.target.value ? Number(e.target.value) : null }))}
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label>Lokasyon Notu</Label>
+            <Input
+              placeholder="Kadıköy, ulaşım akslarına yakın..."
+              value={keypoints.location_note || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, location_note: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Yakınlık / Çevre</Label>
+            <Input
+              placeholder="Denize 500m, metroya 5 dk"
+              value={keypoints.proximity_note || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, proximity_note: e.target.value }))}
+            />
+          </div>
         </CardContent>
       </Card>
 
