@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, Loader as Loader2, Sparkles, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, Loader as Loader2, Sparkles, X, Image as ImageIcon, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { ListingKeypoints } from '@/lib/types/database';
 
@@ -22,9 +22,12 @@ export default function NewListingPage() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [features, setFeatures] = useState<any>({});
+  const [pendingListingId, setPendingListingId] = useState<string | null>(null);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [keypoints, setKeypoints] = useState<ListingKeypoints>({
     listing_type: 'sale',
     property_type: '',
@@ -117,25 +120,10 @@ export default function NewListingPage() {
       setDescription(aiDescription);
       setFeatures(aiFeatures);
 
-      const { error: insertError } = await supabase.from('listings').insert({
-        id: listingId,
-        user_id: user?.id,
-        title: aiTitle,
-        description: aiDescription,
-        image_urls: imageUrls,
-        property_features: {
-          ...keypoints,
-          ...aiFeatures,
-        },
-        status: 'draft',
-      });
-
-      if (insertError) throw insertError;
-
-      toast.success('İlan başarıyla oluşturuldu!');
+      setPendingListingId(listingId);
+      setUploadedImageUrls(imageUrls);
+      toast.success('AI analizi tamamlandı. Şimdi kaydet butonu ile portföyü oluşturun.');
       setAnalyzing(false);
-
-      router.push(`/dashboard/listings/${listingId}`);
     } catch (error: any) {
       toast.error('Bir hata oluştu', {
         description: error.message,
@@ -143,6 +131,40 @@ export default function NewListingPage() {
       setUploading(false);
       setAnalyzing(false);
     }
+  };
+
+  const handleSaveListing = async () => {
+    if (!user || !pendingListingId) {
+      toast.error('Önce AI analizi yapmalısınız');
+      return;
+    }
+
+    setSaving(true);
+
+    const { error: insertError } = await supabase.from('listings').insert({
+      id: pendingListingId,
+      user_id: user.id,
+      title,
+      description,
+      image_urls: uploadedImageUrls,
+      property_features: {
+        ...keypoints,
+        ...features,
+      },
+      status: 'draft',
+    });
+
+    if (insertError) {
+      toast.error('Portföy kaydedilemedi', {
+        description: insertError.message,
+      });
+      setSaving(false);
+      return;
+    }
+
+    toast.success('Portföy kaydedildi');
+    setSaving(false);
+    router.push(`/dashboard/listings/${pendingListingId}`);
   };
 
   return (
@@ -409,6 +431,25 @@ export default function NewListingPage() {
                 </div>
               </div>
             )}
+
+            <Button
+              onClick={handleSaveListing}
+              disabled={saving || !pendingListingId || uploading || analyzing}
+              size="lg"
+              className="w-full"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Kaydediliyor...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Portföyü Kaydet
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
       )}

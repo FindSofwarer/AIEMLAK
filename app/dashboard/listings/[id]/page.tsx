@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Save, Copy, Share2, Loader as Loader2, Sparkles, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
-import { Listing } from '@/lib/types/database';
+import { Listing, ListingKeypoints } from '@/lib/types/database';
 import { toast } from 'sonner';
 
 export default function ListingDetailPage() {
@@ -26,6 +26,7 @@ export default function ListingDetailPage() {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [keypoints, setKeypoints] = useState<ListingKeypoints>({});
 
   const buildMarketplaceTemplate = (platform: 'sahibinden' | 'emlakjet') => {
     const f = listing?.property_features || {};
@@ -73,6 +74,7 @@ export default function ListingDetailPage() {
         setListing(data);
         setTitle(data.title || '');
         setDescription(data.description || '');
+        setKeypoints(data.property_features || {});
       }
       setLoading(false);
     };
@@ -87,6 +89,10 @@ export default function ListingDetailPage() {
       .update({
         title,
         description,
+        property_features: {
+          ...(listing?.property_features || {}),
+          ...keypoints,
+        },
       })
       .eq('id', params.id);
 
@@ -97,7 +103,15 @@ export default function ListingDetailPage() {
     } else {
       toast.success('İlan güncellendi');
       if (listing) {
-        setListing({ ...listing, title, description });
+        setListing({
+          ...listing,
+          title,
+          description,
+          property_features: {
+            ...(listing.property_features || {}),
+            ...keypoints,
+          },
+        });
       }
     }
     setSaving(false);
@@ -194,6 +208,64 @@ export default function ListingDetailPage() {
                   />
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200">
+          <CardHeader>
+            <CardTitle>Portföy Keypoint Alanları</CardTitle>
+            <CardDescription>
+              Bu bilgiler sonradan güncellenebilir ve pazar yeri çıktılarına otomatik yansır.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>İlan Tipi</Label>
+              <Input value={keypoints.listing_type || ''} onChange={(e) => setKeypoints((p) => ({ ...p, listing_type: e.target.value as 'sale' | 'rent' }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Gayrimenkul Tipi</Label>
+              <Input value={keypoints.property_type || ''} onChange={(e) => setKeypoints((p) => ({ ...p, property_type: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Oda Düzeni</Label>
+              <Input value={keypoints.room_layout || ''} onChange={(e) => setKeypoints((p) => ({ ...p, room_layout: e.target.value }))} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Brüt m²</Label>
+              <Input type="number" value={keypoints.gross_m2 ?? ''} onChange={(e) => setKeypoints((p) => ({ ...p, gross_m2: e.target.value ? Number(e.target.value) : null }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Net m²</Label>
+              <Input type="number" value={keypoints.net_m2 ?? ''} onChange={(e) => setKeypoints((p) => ({ ...p, net_m2: e.target.value ? Number(e.target.value) : null }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Bina Yaşı</Label>
+              <Input type="number" value={keypoints.building_age ?? ''} onChange={(e) => setKeypoints((p) => ({ ...p, building_age: e.target.value ? Number(e.target.value) : null }))} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Bulunduğu Kat</Label>
+              <Input type="number" value={keypoints.floor_no ?? ''} onChange={(e) => setKeypoints((p) => ({ ...p, floor_no: e.target.value ? Number(e.target.value) : null }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Toplam Kat</Label>
+              <Input type="number" value={keypoints.total_floors ?? ''} onChange={(e) => setKeypoints((p) => ({ ...p, total_floors: e.target.value ? Number(e.target.value) : null }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Isıtma</Label>
+              <Input value={keypoints.heating_type || ''} onChange={(e) => setKeypoints((p) => ({ ...p, heating_type: e.target.value }))} />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Lokasyon Notu</Label>
+              <Input value={keypoints.location_note || ''} onChange={(e) => setKeypoints((p) => ({ ...p, location_note: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Yakınlık / Çevre</Label>
+              <Input value={keypoints.proximity_note || ''} onChange={(e) => setKeypoints((p) => ({ ...p, proximity_note: e.target.value }))} />
             </div>
           </CardContent>
         </Card>

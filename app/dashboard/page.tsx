@@ -33,19 +33,23 @@ export default function DashboardPage() {
   }, [supabase]);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold text-slate-900">Hoş Geldiniz!</h1>
-        <p className="mt-2 text-lg text-slate-600">
-          AI destekli ilan oluşturma platformuna hoş geldiniz. Fotoğraflarınızı yükleyin ve profesyonel ilan metinlerini saniyeler içinde oluşturun.
+    <div className="max-w-7xl mx-auto space-y-6 pb-8">
+      <div className="rounded-3xl p-5 md:p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white shadow-xl">
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">Emlak Asistan Paneli</h1>
+        <p className="mt-2 text-sm md:text-base text-slate-200 max-w-3xl">
+          Portföy, müşteri ve randevuları tek yerden yönet. iOS tarzı hızlı kartlarla günlük iş akışını kolaylaştır.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <div className="px-3 py-1 rounded-full bg-white/15 backdrop-blur text-xs md:text-sm">Toplam Portföy: {listings.length}</div>
+          <div className="px-3 py-1 rounded-full bg-white/15 backdrop-blur text-xs md:text-sm">Aktif Kullanıcı: {user?.email || 'Giriş yapıldı'}</div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-        <Card className="border-slate-200 hover:shadow-lg transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <Card className="border-white/40 bg-white/70 backdrop-blur-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader>
             <div className="flex items-center space-x-3">
-              <div className="bg-slate-900 p-3 rounded-lg">
+              <div className="bg-slate-900 p-3 rounded-2xl">
                 <Plus className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -64,10 +68,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 hover:shadow-lg transition-shadow">
+        <Card className="border-white/40 bg-white/70 backdrop-blur-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader>
             <div className="flex items-center space-x-3">
-              <div className="bg-slate-900 p-3 rounded-lg">
+              <div className="bg-slate-900 p-3 rounded-2xl">
                 <FolderOpen className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -86,15 +90,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100">
+        <Card className="border-white/40 bg-white/70 backdrop-blur-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader>
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-3 rounded-lg">
+              <div className="bg-gradient-to-br from-indigo-500 to-violet-500 p-3 rounded-2xl">
                 <Sparkles className="h-6 w-6 text-white" />
               </div>
               <div>
                 <CardTitle>AI Teknolojisi</CardTitle>
-                <CardDescription>Gemini 1.5 Flash ile çalışır</CardDescription>
+                <CardDescription>Akıllı içerik üretimi</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -105,10 +109,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 hover:shadow-lg transition-shadow">
+        <Card className="border-white/40 bg-white/70 backdrop-blur-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader>
             <div className="flex items-center space-x-3">
-              <div className="bg-slate-900 p-3 rounded-lg">
+              <div className="bg-slate-900 p-3 rounded-2xl">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -127,10 +131,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 hover:shadow-lg transition-shadow">
+        <Card className="border-white/40 bg-white/70 backdrop-blur-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader>
             <div className="flex items-center space-x-3">
-              <div className="bg-slate-900 p-3 rounded-lg">
+              <div className="bg-slate-900 p-3 rounded-2xl">
                 <CalendarClock className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -150,7 +154,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="border-slate-200">
+      <Card className="border-white/40 bg-white/80 backdrop-blur-xl shadow-sm">
         <CardHeader>
           <CardTitle>Son İlanlar</CardTitle>
           <CardDescription>
