@@ -169,11 +169,35 @@ export default function NewListingPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">Yeni İlan Oluştur</h1>
-        <p className="mt-2 text-slate-600">
-          Emlak fotoğraflarını yükleyin, AI sizin için profesyonel bir ilan metni oluştursun.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Yeni İlan Oluştur</h1>
+          <p className="mt-2 text-slate-600">
+            Emlak fotoğraflarını yükleyin, AI sizin için profesyonel bir ilan metni oluştursun.
+          </p>
+        </div>
+        <Button
+          onClick={handleSaveListing}
+          disabled={saving || !pendingListingId || uploading || analyzing}
+          className="w-full sm:w-auto"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Kaydediliyor...
+            </>
+          ) : !pendingListingId ? (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              Analiz Sonrası Kaydet
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              Portföyü Kaydet
+            </>
+          )}
+        </Button>
       </div>
 
       <Card className="border-slate-200">
@@ -269,19 +293,30 @@ export default function NewListingPage() {
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>İlan Tipi</Label>
-            <Input
-              placeholder="sale / rent"
+            <select
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
               value={keypoints.listing_type || ''}
               onChange={(e) => setKeypoints((p) => ({ ...p, listing_type: e.target.value as 'sale' | 'rent' }))}
-            />
+            >
+              <option value="sale">Satılık</option>
+              <option value="rent">Kiralık</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label>Gayrimenkul Tipi</Label>
-            <Input
-              placeholder="Daire, Villa..."
+            <select
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
               value={keypoints.property_type || ''}
               onChange={(e) => setKeypoints((p) => ({ ...p, property_type: e.target.value }))}
-            />
+            >
+              <option value="">Seçiniz</option>
+              <option value="Daire">Daire</option>
+              <option value="Villa">Villa</option>
+              <option value="Müstakil Ev">Müstakil Ev</option>
+              <option value="Residence">Residence</option>
+              <option value="Arsa">Arsa</option>
+              <option value="İşyeri">İşyeri</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label>Oda Düzeni</Label>
@@ -335,11 +370,19 @@ export default function NewListingPage() {
           </div>
           <div className="space-y-2">
             <Label>Isıtma</Label>
-            <Input
-              placeholder="Kombi, Merkezi..."
+            <select
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
               value={keypoints.heating_type || ''}
               onChange={(e) => setKeypoints((p) => ({ ...p, heating_type: e.target.value }))}
-            />
+            >
+              <option value="">Seçiniz</option>
+              <option value="Kombi (Doğalgaz)">Kombi (Doğalgaz)</option>
+              <option value="Merkezi">Merkezi</option>
+              <option value="Yerden Isıtma">Yerden Isıtma</option>
+              <option value="Klima">Klima</option>
+              <option value="Soba">Soba</option>
+              <option value="Yok">Yok</option>
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -365,6 +408,53 @@ export default function NewListingPage() {
               value={keypoints.dues_try ?? ''}
               onChange={(e) => setKeypoints((p) => ({ ...p, dues_try: e.target.value ? Number(e.target.value) : null }))}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Eşyalı</Label>
+            <select
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+              value={keypoints.furnished === null ? '' : keypoints.furnished ? 'true' : 'false'}
+              onChange={(e) =>
+                setKeypoints((p) => ({
+                  ...p,
+                  furnished: e.target.value === '' ? null : e.target.value === 'true',
+                }))
+              }
+            >
+              <option value="">Belirtilmedi</option>
+              <option value="true">Evet</option>
+              <option value="false">Hayır</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Kullanım Durumu</Label>
+            <select
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+              value={keypoints.usage_status || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, usage_status: e.target.value }))}
+            >
+              <option value="">Seçiniz</option>
+              <option value="Boş">Boş</option>
+              <option value="Mülk Sahibi Oturuyor">Mülk Sahibi Oturuyor</option>
+              <option value="Kiracılı">Kiracılı</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tapu Durumu</Label>
+            <select
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+              value={keypoints.deed_status || ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, deed_status: e.target.value }))}
+            >
+              <option value="">Seçiniz</option>
+              <option value="Kat Mülkiyeti">Kat Mülkiyeti</option>
+              <option value="Kat İrtifakı">Kat İrtifakı</option>
+              <option value="Hisseli Tapu">Hisseli Tapu</option>
+              <option value="Arsa Tapusu">Arsa Tapusu</option>
+            </select>
           </div>
 
           <div className="space-y-2 md:col-span-2">
@@ -432,24 +522,6 @@ export default function NewListingPage() {
               </div>
             )}
 
-            <Button
-              onClick={handleSaveListing}
-              disabled={saving || !pendingListingId || uploading || analyzing}
-              size="lg"
-              className="w-full"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Kaydediliyor...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Portföyü Kaydet
-                </>
-              )}
-            </Button>
           </CardContent>
         </Card>
       )}

@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { navigation, Sidebar } from '@/components/dashboard/sidebar';
 import { Loader as Loader2, Menu, House } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -63,6 +63,9 @@ export default function DashboardLayout({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-[85vw] max-w-[320px]">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Mobil Menü</SheetTitle>
+              </SheetHeader>
               <Sidebar onNavigate={() => setMobileMenuOpen(false)} />
             </SheetContent>
           </Sheet>
