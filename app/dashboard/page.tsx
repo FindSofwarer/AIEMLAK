@@ -9,34 +9,12 @@ import { Plus, FolderOpen, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Customer, Listing } from '@/lib/types/database';
 
-type MonthPoint = { label: string; listings: number; customers: number };
-
 export default function DashboardPage() {
   const { user } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
-
-  const points: MonthPoint[] = Array.from({ length: 6 }).map((_, i) => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - (5 - i));
-    const label = d.toLocaleDateString('tr-TR', { month: 'short' });
-
-    const listingCount = listings.filter((l) => {
-      const ld = new Date(l.created_at);
-      return ld.getMonth() === d.getMonth() && ld.getFullYear() === d.getFullYear();
-    }).length;
-
-    const customerCount = customers.filter((c) => {
-      const cd = new Date(c.created_at);
-      return cd.getMonth() === d.getMonth() && cd.getFullYear() === d.getFullYear();
-    }).length;
-
-    return { label, listings: listingCount, customers: customerCount };
-  });
-
-  const maxY = Math.max(1, ...points.map((p) => Math.max(p.listings, p.customers)));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,82 +32,35 @@ export default function DashboardPage() {
   }, [supabase]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5 pb-8">
-      <div className="rounded-3xl p-5 md:p-7 bg-gradient-to-br from-[#0A84FF] via-[#5E5CE6] to-[#BF5AF2] text-white shadow-xl">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Hoş geldin {user?.email?.split('@')[0] || ''}</h1>
-        <p className="mt-1 text-white/90 text-sm md:text-base">Sadece gerekli metrikler: portföy, müşteri, hızlı aksiyonlar.</p>
+    <div className="max-w-5xl mx-auto space-y-5 pb-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Panel</h1>
+          <p className="text-sm text-slate-500">Hoş geldin {user?.email?.split('@')[0] || ''}</p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/dashboard/new-listing">
+            <Button><Plus className="mr-2 h-4 w-4" />Yeni İlan</Button>
+          </Link>
+          <Link href="/dashboard/customers">
+            <Button variant="outline"><Users className="mr-2 h-4 w-4" />Müşteriler</Button>
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card className="bg-white/80 backdrop-blur border-slate-200">
-          <CardContent className="pt-5">
-            <p className="text-xs text-slate-500">Toplam Portföy</p>
-            <p className="text-2xl font-semibold mt-1">{listings.length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/80 backdrop-blur border-slate-200">
-          <CardContent className="pt-5">
-            <p className="text-xs text-slate-500">Toplam Müşteri</p>
-            <p className="text-2xl font-semibold mt-1">{customers.length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/80 backdrop-blur border-slate-200">
-          <CardContent className="pt-5">
-            <div className="flex gap-2">
-              <Link href="/dashboard/new-listing" className="flex-1">
-                <Button className="w-full"><Plus className="mr-2 h-4 w-4" />Yeni</Button>
-              </Link>
-              <Link href="/dashboard/listings" className="flex-1">
-                <Button variant="outline" className="w-full"><FolderOpen className="mr-2 h-4 w-4" />Portföy</Button>
-              </Link>
-              <Link href="/dashboard/customers" className="flex-1">
-                <Button variant="outline" className="w-full"><Users className="mr-2 h-4 w-4" />Müşteri</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex flex-wrap gap-2">
+        <div className="px-3 py-1.5 rounded-full border bg-white text-sm text-slate-700">
+          Portföy: <span className="font-semibold">{listings.length}</span>
+        </div>
+        <div className="px-3 py-1.5 rounded-full border bg-white text-sm text-slate-700">
+          Müşteri: <span className="font-semibold">{customers.length}</span>
+        </div>
       </div>
-
-      <Card className="bg-white/80 backdrop-blur border-slate-200">
-        <CardHeader>
-          <CardTitle>Müşteri & Portföy Grafiği</CardTitle>
-          <CardDescription>Son 6 ay</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {points.map((p) => (
-              <div key={p.label} className="grid grid-cols-[44px_1fr] gap-3 items-center">
-                <span className="text-xs text-slate-500">{p.label}</span>
-                <div className="space-y-2">
-                  <div>
-                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-2 rounded-full bg-[#0A84FF]"
-                        style={{ width: `${(p.listings / maxY) * 100}%` }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-1">Portföy: {p.listings}</p>
-                  </div>
-                  <div>
-                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-2 rounded-full bg-[#34C759]"
-                        style={{ width: `${(p.customers / maxY) * 100}%` }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-1">Müşteri: {p.customers}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       <Card className="bg-white/80 backdrop-blur border-slate-200">
         <CardHeader>
           <CardTitle>Son İlanlar</CardTitle>
-          <CardDescription>Gerekli özet alanlar</CardDescription>
+          <CardDescription>En son portföy kayıtları</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
