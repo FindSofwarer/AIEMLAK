@@ -20,6 +20,7 @@ export interface PropertyFeatures {
 export interface ListingKeypoints {
   listing_type?: 'sale' | 'rent';
   property_type?: string;
+  price_try?: number | null;
   gross_m2?: number | null;
   net_m2?: number | null;
   room_layout?: string | null;

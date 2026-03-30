@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     );
 
     const propertyDetailsContext = propertyDetails
-      ? `\n\nKULLANICININ GİRDİĞİ PORTFÖY KEYPOINT BİLGİLERİ:\n${JSON.stringify(propertyDetails, null, 2)}\nBu bilgiler görsellerle çelişmiyorsa öncelikli kabul edilsin.`
+      ? `\n\nKULLANICININ GİRDİĞİ PORTFÖY KEYPOINT BİLGİLERİ:\n${JSON.stringify(propertyDetails, null, 2)}\nBu bilgiler görsellerle çelişmiyorsa ÖNCELİKLİ kabul et. Çıktıdaki title/description/features alanlarına bu keypointleri mümkün olduğunca yansıt. Özellikle: listing_type, property_type, price_try, room_layout, gross_m2, net_m2, floor_no, total_floors, heating_type, bathrooms_count, balcony_count, furnished, usage_status, deed_status, location_note, proximity_note.`
       : '';
 
     const prompt = `Bu fotoğraflardaki evi profesyonel bir emlakçı ve iç mimar perspektifinden analiz et.

@@ -227,12 +227,27 @@ export default function ListingDetailPage() {
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>İlan Tipi</Label>
-              <Input value={keypoints.listing_type || ''} onChange={(e) => setKeypoints((p) => ({ ...p, listing_type: e.target.value as 'sale' | 'rent' }))} />
+                <select
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                  value={keypoints.listing_type || 'sale'}
+                  onChange={(e) => setKeypoints((p) => ({ ...p, listing_type: e.target.value as 'sale' | 'rent' }))}
+                >
+                  <option value="sale">Satılık</option>
+                  <option value="rent">Kiralık</option>
+                </select>
             </div>
             <div className="space-y-2">
               <Label>Gayrimenkul Tipi</Label>
               <Input value={keypoints.property_type || ''} onChange={(e) => setKeypoints((p) => ({ ...p, property_type: e.target.value }))} />
             </div>
+              <div className="space-y-2">
+                <Label>Fiyat (₺)</Label>
+                <Input
+                  type="number"
+                  value={keypoints.price_try ?? ''}
+                  onChange={(e) => setKeypoints((p) => ({ ...p, price_try: e.target.value ? Number(e.target.value) : null }))}
+                />
+              </div>
             <div className="space-y-2">
               <Label>Oda Düzeni</Label>
               <Input value={keypoints.room_layout || ''} onChange={(e) => setKeypoints((p) => ({ ...p, room_layout: e.target.value }))} />

@@ -31,6 +31,7 @@ export default function NewListingPage() {
   const [keypoints, setKeypoints] = useState<ListingKeypoints>({
     listing_type: 'sale',
     property_type: '',
+    price_try: null,
     gross_m2: null,
     net_m2: null,
     room_layout: '',
@@ -317,6 +318,15 @@ export default function NewListingPage() {
               <option value="Arsa">Arsa</option>
               <option value="İşyeri">İşyeri</option>
             </select>
+          </div>
+          <div className="space-y-2">
+            <Label>Fiyat (₺)</Label>
+            <Input
+              type="number"
+              placeholder="Örn. 4250000"
+              value={keypoints.price_try ?? ''}
+              onChange={(e) => setKeypoints((p) => ({ ...p, price_try: e.target.value ? Number(e.target.value) : null }))}
+            />
           </div>
           <div className="space-y-2">
             <Label>Oda Düzeni</Label>
