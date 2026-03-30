@@ -163,6 +163,16 @@ export default function NewListingPage() {
       return;
     }
 
+    const automationRes = await fetch('/api/listings/trigger-automation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listing_id: pendingListingId }),
+    });
+
+    if (!automationRes.ok) {
+      toast.warning('İlan kaydedildi, otomasyon tetiklenemedi');
+    }
+
     toast.success('Portföy kaydedildi');
     setSaving(false);
     router.push(`/dashboard/listings/${pendingListingId}`);

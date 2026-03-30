@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Copy, Share2, Loader as Loader2, Sparkles, Download } from 'lucide-react';
+import { ArrowLeft, Save, Copy, Share2, Loader as Loader2, Sparkles, Download, Wand2 } from 'lucide-react';
 import Link from 'next/link';
 import { Listing, ListingKeypoints } from '@/lib/types/database';
 import { toast } from 'sonner';
@@ -27,6 +27,23 @@ export default function ListingDetailPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [keypoints, setKeypoints] = useState<ListingKeypoints>({});
+
+  const statusLabel = listing?.status === 'published'
+    ? 'Yayında'
+    : listing?.status === 'generating'
+      ? 'Üretiliyor'
+      : 'Taslak';
+
+  const statusClassName = listing?.status === 'published'
+    ? 'bg-green-500 hover:bg-green-600'
+    : listing?.status === 'generating'
+      ? 'bg-amber-500 hover:bg-amber-600'
+      : '';
+
+  const orderedImages = [
+    ...(listing?.automation_image_url ? [listing.automation_image_url] : []),
+    ...((listing?.image_urls || []).filter((url) => url !== listing?.automation_image_url)),
+  ];
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -113,14 +130,18 @@ export default function ListingDetailPage() {
   };
 
   const handleDownloadImages = async () => {
-    if (!listing?.image_urls?.length) {
+    if (!listing) {
+      return;
+    }
+
+    if (!orderedImages.length) {
       toast.error('İndirilecek fotoğraf yok');
       return;
     }
 
     try {
-      for (let i = 0; i < listing.image_urls.length; i++) {
-        const url = listing.image_urls[i];
+      for (let i = 0; i < orderedImages.length; i++) {
+        const url = orderedImages[i];
         const response = await fetch(url);
         if (!response.ok) {
           window.open(url, '_blank');
@@ -142,6 +163,37 @@ export default function ListingDetailPage() {
     } catch {
       toast.error('Fotoğraflar indirilemedi');
     }
+  };
+
+  const handleStartAutomation = async () => {
+    if (!listing) return;
+
+    const { error: statusError } = await supabase
+      .from('listings')
+      .update({ status: 'generating' })
+      .eq('id', listing.id);
+
+    if (statusError) {
+      toast.error('İlan durumu güncellenemedi', {
+        description: statusError.message,
+      });
+      return;
+    }
+
+    setListing({ ...listing, status: 'generating' });
+
+    const triggerRes = await fetch('/api/listings/trigger-automation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listing_id: listing.id }),
+    });
+
+    if (!triggerRes.ok) {
+      toast.error('n8n otomasyonu tetiklenemedi');
+      return;
+    }
+
+    toast.success('n8n otomasyonu tetiklendi');
   };
 
   if (loading) {
@@ -175,14 +227,14 @@ export default function ListingDetailPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <Badge
             variant={listing.status === 'published' ? 'default' : 'secondary'}
-            className={
-              listing.status === 'published'
-                ? 'bg-green-500 hover:bg-green-600'
-                : ''
-            }
+            className={statusClassName}
           >
-            {listing.status === 'published' ? 'Yayında' : 'Taslak'}
+            {statusLabel}
           </Badge>
+          <Button variant="outline" onClick={handleStartAutomation}>
+            <Wand2 className="mr-2 h-4 w-4" />
+            AI Otomasyonunu Başlat
+          </Button>
           <Button variant="outline" onClick={handlePublish}>
             <Share2 className="mr-2 h-4 w-4" />
             {listing.status === 'published' ? 'Taslağa Al' : 'Yayınla'}
@@ -195,16 +247,16 @@ export default function ListingDetailPage() {
           <CardHeader>
             <CardTitle>Fotoğraflar</CardTitle>
             <CardDescription>
-              İlana ait {listing.image_urls?.length || 0} fotoğraf
+              İlana ait {orderedImages.length || 0} görsel
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
-              {listing.image_urls?.map((url, index) => (
+              {orderedImages.map((url, index) => (
                 <div key={index} className="aspect-square bg-slate-100 rounded-lg overflow-hidden">
                   <img
                     src={url}
-                    alt={`Property ${index + 1}`}
+                    alt={index === 0 && listing.automation_image_url === url ? 'Automation visual' : `Property ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </div>

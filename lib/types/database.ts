@@ -2,6 +2,7 @@ export interface Profile {
   id: string;
   full_name: string | null;
   agency_name: string | null;
+  api_key: string;
   subscription_status: 'free' | 'pro' | 'enterprise';
   created_at: string;
 }
@@ -43,9 +44,12 @@ export interface Listing {
   user_id: string;
   title: string | null;
   description: string | null;
+  ai_title: string | null;
+  ai_description: string | null;
   image_urls: string[];
+  automation_image_url: string | null;
   property_features: PropertyFeatures & ListingKeypoints;
-  status: 'draft' | 'published';
+  status: 'draft' | 'generating' | 'published';
   created_at: string;
   updated_at: string;
 }

@@ -186,12 +186,17 @@ export default function ListingsPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredListings.map((listing) => (
+          {filteredListings.map((listing) => {
+            const coverImage = listing.automation_image_url || listing.image_urls?.[0] || null;
+            const statusLabel = listing.status === 'published' ? 'Yayında' : listing.status === 'generating' ? 'Üretiliyor' : 'Taslak';
+            const statusClassName = listing.status === 'published' ? 'bg-green-500 hover:bg-green-600' : listing.status === 'generating' ? 'bg-amber-500 hover:bg-amber-600' : '';
+
+            return (
             <Card key={listing.id} className="border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-video bg-slate-100 relative">
-                {listing.image_urls && listing.image_urls.length > 0 ? (
+                {coverImage ? (
                   <img
-                    src={listing.image_urls[0]}
+                    src={coverImage}
                     alt={listing.title || 'Listing'}
                     className="w-full h-full object-cover"
                   />
@@ -203,13 +208,9 @@ export default function ListingsPage() {
                 <div className="absolute top-3 right-3">
                   <Badge
                     variant={listing.status === 'published' ? 'default' : 'secondary'}
-                    className={
-                      listing.status === 'published'
-                        ? 'bg-green-500 hover:bg-green-600'
-                        : ''
-                    }
+                    className={statusClassName}
                   >
-                    {listing.status === 'published' ? 'Yayında' : 'Taslak'}
+                    {statusLabel}
                   </Badge>
                 </div>
               </div>
@@ -280,7 +281,8 @@ export default function ListingsPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

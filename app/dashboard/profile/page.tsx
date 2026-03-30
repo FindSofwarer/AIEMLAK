@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Loader as Loader2, Save, User as UserIcon, Building2 } from 'lucide-react';
+import { Loader as Loader2, Save, User as UserIcon, Building2, Copy, RefreshCcw } from 'lucide-react';
 import { Profile } from '@/lib/types/database';
 import { toast } from 'sonner';
 
@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [refreshingApiKey, setRefreshingApiKey] = useState(false);
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
 
@@ -66,6 +67,38 @@ export default function ProfilePage() {
       }
     }
     setSaving(false);
+  };
+
+  const handleRefreshApiKey = async () => {
+    if (!user) return;
+
+    setRefreshingApiKey(true);
+    const newApiKey = crypto.randomUUID();
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ api_key: newApiKey })
+      .eq('id', user.id)
+      .select('*')
+      .maybeSingle();
+
+    if (error) {
+      toast.error('API key yenilenemedi', {
+        description: error.message,
+      });
+    } else {
+      setProfile(data as Profile);
+      toast.success('API key yenilendi');
+    }
+
+    setRefreshingApiKey(false);
+  };
+
+  const handleCopyApiKey = async () => {
+    if (!profile?.api_key) return;
+
+    await navigator.clipboard.writeText(profile.api_key);
+    toast.success('API key kopyalandı');
   };
 
   if (loading) {
@@ -150,6 +183,46 @@ export default function ProfilePage() {
               </>
             )}
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-slate-200">
+        <CardHeader>
+          <CardTitle>Automation API Key</CardTitle>
+          <CardDescription>
+            n8n webhook geri dönüşlerinde bu anahtar ile tenant doğrulaması yapılır
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="apiKey">API Key</Label>
+            <Input
+              id="apiKey"
+              value={profile?.api_key || ''}
+              disabled
+              className="font-mono text-xs sm:text-sm bg-slate-50"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <Button type="button" variant="outline" onClick={handleCopyApiKey} disabled={!profile?.api_key}>
+              <Copy className="mr-2 h-4 w-4" />
+              Kopyala
+            </Button>
+            <Button type="button" onClick={handleRefreshApiKey} disabled={refreshingApiKey}>
+              {refreshingApiKey ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Yenileniyor...
+                </>
+              ) : (
+                <>
+                  <RefreshCcw className="mr-2 h-4 w-4" />
+                  Yenile
+                </>
+              )}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

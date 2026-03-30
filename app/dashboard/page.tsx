@@ -20,6 +20,7 @@ export default function DashboardPage() {
 
   const publishedCount = listings.filter((l) => l.status === 'published').length;
   const draftCount = listings.filter((l) => l.status === 'draft').length;
+  const generatingCount = listings.filter((l) => l.status === 'generating').length;
   const saleCount = listings.filter((l) => l.property_features?.listing_type !== 'rent').length;
   const rentCount = listings.filter((l) => l.property_features?.listing_type === 'rent').length;
 
@@ -76,7 +77,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <Card className="bg-white/80 backdrop-blur border-slate-200 rounded-2xl">
           <CardContent className="pt-4">
             <p className="text-xs text-slate-500">Toplam Portföy</p>
@@ -93,6 +94,12 @@ export default function DashboardPage() {
           <CardContent className="pt-4">
             <p className="text-xs text-slate-500">Taslak İlan</p>
             <p className="text-2xl font-semibold mt-1 text-amber-600">{draftCount}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-white/80 backdrop-blur border-slate-200 rounded-2xl">
+          <CardContent className="pt-4">
+            <p className="text-xs text-slate-500">Üretilen İlan</p>
+            <p className="text-2xl font-semibold mt-1 text-orange-600">{generatingCount}</p>
           </CardContent>
         </Card>
         <Card className="bg-white/80 backdrop-blur border-slate-200 rounded-2xl">
@@ -203,10 +210,12 @@ export default function DashboardPage() {
                       className={`px-3 py-1 text-xs font-medium rounded-full ${
                         listing.status === 'published'
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-slate-200 text-slate-700'
+                          : listing.status === 'generating'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-slate-200 text-slate-700'
                       }`}
                     >
-                      {listing.status === 'published' ? 'Yayında' : 'Taslak'}
+                      {listing.status === 'published' ? 'Yayında' : listing.status === 'generating' ? 'Üretiliyor' : 'Taslak'}
                     </span>
                   </div>
                 </Link>

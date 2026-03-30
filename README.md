@@ -46,6 +46,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Google Gemini AI
 GEMINI_API_KEY=your_gemini_api_key
+
+# n8n Outbound Webhook (RealsAI -> n8n)
+N8N_LISTING_WEBHOOK_URL=https://your-n8n-instance/webhook/realsai-new-listing
 \`\`\`
 
 ### 4. Supabase Kurulumu
@@ -106,6 +109,7 @@ Uygulama [http://localhost:3000](http://localhost:3000) adresinde çalışacak.
 - id: UUID (references auth.users)
 - full_name: TEXT
 - agency_name: TEXT
+- api_key: UUID (tenant bazlı automation key)
 - subscription_status: TEXT (free, pro, enterprise)
 - created_at: TIMESTAMPTZ
 \`\`\`
@@ -116,12 +120,64 @@ Uygulama [http://localhost:3000](http://localhost:3000) adresinde çalışacak.
 - user_id: UUID (references auth.users)
 - title: TEXT
 - description: TEXT
+- ai_title: TEXT
+- ai_description: TEXT
 - image_urls: TEXT[]
+- automation_image_url: TEXT
 - property_features: JSONB
-- status: TEXT (draft, published)
+- status: TEXT (draft, generating, published)
 - created_at: TIMESTAMPTZ
 - updated_at: TIMESTAMPTZ
 \`\`\`
+
+## n8n Entegrasyonu
+
+### Outbound Trigger
+- Endpoint: `POST /api/listings/trigger-automation`
+- Ne zaman çağrılır:
+  - Yeni ilan kaydedildikten sonra
+  - İlan detayında `AI Otomasyonunu Başlat` tıklandığında (`status = generating`)
+- n8n'e giden payload:
+
+```json
+{
+  "listing_id": "uuid",
+  "user_id": "uuid",
+  "api_key": "uuid",
+  "keypoints": {
+    "listing_type": "sale",
+    "room_layout": "2+1"
+  }
+}
+```
+
+### Inbound Callback
+- Endpoint: `PATCH /api/listings/update-automation`
+- n8n payload örneği:
+
+```json
+{
+  "listing_id": "uuid",
+  "api_key": "uuid",
+  "ai_title": "Profesyonel başlık",
+  "ai_description": "İlan metni",
+  "generated_image_url": "https://..."
+}
+```
+
+- Güvenlik:
+  - RLS açık kalır
+  - `x-api-key` header'ı ile listing sahibinin `profiles.api_key` eşleşmesi zorunludur
+  - Eşleşme yoksa update reddedilir
+
+## 0 TL ile n8n Kurulum Önerisi
+
+- Yerelde ücretsiz: Docker Desktop ile n8n Community sürümü çalıştırın.
+- Ücretsiz bulut denemesi: n8n cloud trial (sınırlı süre).
+- Görsel üretim için sıfır maliyet yaklaşımı:
+  - Bannerbear yerine n8n içinde HTML template + screenshot yaklaşımı
+  - Cloudinary free tier (aylık kota ile)
+  - Düşük hacimde Gemini ücretsiz kotası
 
 ## Güvenlik
 
